@@ -96,11 +96,11 @@ class Planner:
         """
         # Calcular el TDEE
         tdee = self.tmb(peso, altura, edad, genero, objetivo, PAL)
-        print(f"Calorías necesarias para el plan nutricional por día: {tdee}")
-
+       # print(f"Calorías necesarias para el plan nutricional por día: {tdee}")
+        print(f"Calculando las calorias......")
         # Calcular calorías totales para los días del plan
         calorias_totales = tdee * dias
-        print(f"Calorías totales para el plan de {dias} días: {calorias_totales}")
+        #print(f"Calorías totales para el plan de {dias} días: {calorias_totales}")
 
         return calorias_totales
 
@@ -231,9 +231,9 @@ class Planner:
             for momento, proporcion_comida in proporciones_comidas.items():
                 calorias_objetivo = calorias_diarias * proporcion_comida
                 comida = self.armar_comida_ajustada(momento, calorias_objetivo, proporciones_macros, plan_id)
-                print(f"----------------------------------")
-                print(comida)
-                print(f"----------------------------------")
+                # print(f"----------------------------------")
+                # print(comida)
+                # print(f"----------------------------------")
 
                 # registra la comida y los alimentos que pertenecen a ella
                 meal = save_meal(objetivo, momento, self.calories_t, comida, plan_id)
@@ -250,4 +250,3 @@ class Planner:
             plan_comidas.append(comidas_dia)
 
         return plan_comidas
-

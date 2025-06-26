@@ -195,7 +195,6 @@ def get_calories_plan(id):
 
 
 def calculate_proteins(food):
-    print("comida recibida:", food)
     pro = 0
     for foo in food:
         if 'alimento' not in foo:
@@ -210,7 +209,6 @@ def calculate_proteins(food):
 
 
 def calculate_fats(food):
-    print("comida recibida:", food)
     fats = 0
     for foo in food:
         if 'alimento' not in foo:
@@ -225,7 +223,6 @@ def calculate_fats(food):
 
 
 def calculate_carbohydrates(food):
-    print("comida recibida:", food)
     carbohydrates = 0
     for foo in food:
         if 'alimento' not in foo:

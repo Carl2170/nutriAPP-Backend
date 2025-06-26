@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: nutri_app1
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Eyeoftiger123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    # volumes:
+    #   - .:/app
+    depends_on:
+      - db
+    env_file:
+      - .env
+    command: >
+      sh -c "
+        flask db upgrade &&
+        flask seed-physical-activities-db &&
+        flask seed-users-health-profiles-db &&
+        flask seed-food-db &&
+        flask seed-meal-db &&
+        flask seed-measure-food-db &&
+        flask run --host=0.0.0.0
+      "
+
+volumes:
+  postgres_data:

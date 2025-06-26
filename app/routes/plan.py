@@ -1,9 +1,13 @@
 from flask import Blueprint, jsonify, request
 from datetime import datetime
+import locale
+from collections import defaultdict
+
 
 from app.database import db
 from app.models.meal import Meal
 from app.models.food import Food
+from app.models.meal_food import MealFood
 from app.models.plan import Plan
 from app.models.plan_meal import PlanMeal
 from app.models.health_profile import HealthProfile
@@ -17,7 +21,8 @@ from app.routes.auth import token_required
 
 plan_meal_bp = Blueprint("plan_meal", __name__, url_prefix="/api/plan-meal")
 
-
+# locale.setlocale(locale.LC_TIME, 'es_ES')
+locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
 # con ia (token muy limitados)
 @plan_meal_bp.route("/generate-plan", methods=["POST"])
 @token_required
@@ -97,12 +102,12 @@ def generate_plan_1(current_user_id):
     pal = PhysicalActivity.query.filter_by(id=healt_profile.physical_activity_id).first()
     # Calcular las calorías necesarias para el plan completo
     calories_total = planner.calories(healt_profile.weight,
-                                      healt_profile.height * 100,
+                                      healt_profile.height,
                                       healt_profile.age,
                                       healt_profile.gender,
                                       objective, pal.PAL,
                                       numbers_days)
-    print(f"calories_total: {calories_total}")
+  #  print(f"calories_total: {calories_total}")
     plan = create_plan(objective, calories_total, current_user_id)
 
     # Ya se tiene DataFrame df_food con los alimentos disponibles
@@ -781,3 +786,91 @@ def get_plan_by_id(current_user_id, plan_id):
         response["meals"].append(meal_data)
 
     return jsonify(response)
+
+
+# obtener listado de calorias del plan
+@plan_meal_bp.route("/list-calories", methods=["GET"])
+@token_required
+def get_calories_list1(current_user_id):
+    # Obtener los planes del usuario actual
+    plans = Plan.query.filter_by(user_id=current_user_id).all()
+    if not plans:
+        return jsonify({"error": "No se encontraron planes asociados al usuario"}), 404
+
+    # Diccionario para almacenar las calorías agrupadas por fecha
+    calories_by_date = {}
+
+    for plan in plans:
+        # Obtener las comidas asociadas al plan
+        meals = PlanMeal.query.filter_by(plan_id=plan.id).all()
+        if not meals:
+            continue  # Si no hay comidas en este plan, saltar al siguiente
+
+        for meal in meals:
+            me = Meal.query.filter_by(id=meal.meal_id).first()
+            if me:
+                # Obtener la fecha de la comida
+                plan_meal = PlanMeal.query.filter_by(meal_id=me.id, plan_id=plan.id).first()
+                meal_date = plan_meal.date.strftime('%Y-%m-%d')
+                day_of_week = plan_meal.date.strftime('%A')
+
+                # Sumar las calorías al total correspondiente a esa fecha
+                if meal_date not in calories_by_date:
+                    calories_by_date[meal_date] = {
+                        "fecha": meal_date,
+                        "dia_semana": day_of_week,
+                        "calorias": 0.0
+                    }
+                calories_by_date[meal_date]["calorias"] += me.total_calories
+
+    # Convertir los datos a una lista
+    calories_list = list(calories_by_date.values())
+
+    # Retornar la lista de calorías agrupadas por fecha
+    return jsonify(calories_list), 200
+
+@plan_meal_bp.route('/porcentaje-plan', methods=['GET'])
+@token_required
+def obtener_porcentajes_categorias_por_plan(current_user_id):
+    # Consultar todos los planes disponibles
+    planes = Plan.query.filter_by(user_id=current_user_id).all()
+    
+    resultado = []
+    
+    for plan in planes:
+        # Obtener todas las comidas asociadas al plan
+        plan_meals = PlanMeal.query.filter_by(plan_id=plan.id).all()
+        
+        # Inicializar variables para calcular el total de calorías por plan
+        total_calorias_plan = 0
+        categorias = defaultdict(float)
+        
+        for plan_meal in plan_meals:
+            meal = plan_meal.meal  # Obtener la comida asociada
+            
+            # Consultar los alimentos asociados a cada comida
+            meal_foods = MealFood.query.filter_by(meal_id=meal.id).all()
+            
+            for meal_food in meal_foods:
+                food = meal_food.food  # Obtener el alimento
+                
+                # Asumimos que cada alimento tiene una categoría
+                categoria = food.category  # Por ejemplo: 'Carnes', 'Pescados', etc.
+                cantidad = meal_food.quantity
+                
+                # Sumar la cantidad al total de la categoría
+                categorias[categoria] += cantidad
+                total_calorias_plan += cantidad  # Se puede ajustar a calorías u otra unidad
+                
+        # Calcular el porcentaje de cada categoría respecto al total
+        porcentajes = {categoria: (cantidad / total_calorias_plan) * 100 
+                       for categoria, cantidad in categorias.items()}
+        
+        # Formatear el resultado
+        resultado.append({
+            "plan_id": plan.id,
+            "name": plan.name,
+            "porcentajes": porcentajes
+        })
+    
+    return jsonify(resultado)
