@@ -48,7 +48,7 @@ def create_app():
     app.register_blueprint(plan_meal_bp)
 
     # Registrar comandos CLI
-    register_cli_commands(app)
+  #  register_cli_commands(app)
 
     return app
 
