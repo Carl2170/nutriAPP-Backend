@@ -22,7 +22,10 @@ from app.routes.auth import token_required
 plan_meal_bp = Blueprint("plan_meal", __name__, url_prefix="/api/plan-meal")
 
 # locale.setlocale(locale.LC_TIME, 'es_ES')
-locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+try:
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+except locale.Error:
+    locale.setlocale(locale.LC_TIME, 'C')  # Fallback para Render o sistemas sin ese locale
 # con ia (token muy limitados)
 @plan_meal_bp.route("/generate-plan", methods=["POST"])
 @token_required
