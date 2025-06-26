@@ -9,7 +9,7 @@ __pycache__/
 .env
 
 # Ignorar la carpeta de migraciones
-migrations/
+
 
 #Ignorar la carpeta .idea
 .idea/
