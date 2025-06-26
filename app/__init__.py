@@ -30,7 +30,7 @@ def create_app():
     Swagger(app)
 
     # Inicializar la base de datos y configuración
-    create_database()  # Crear la base de datos si no existe
+  #  create_database()  # Crear la base de datos si no existe
     configure_app(app)  # Configurar la base de datos para la app
 
     # Registrar extensiones
