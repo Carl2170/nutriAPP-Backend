@@ -46,11 +46,11 @@ COPY . .
 EXPOSE 5000
 
 # Comando por defecto para correr la app
-# CMD ["sh", "-c", "flask run --host=0.0.0.0"]
-CMD ["sh", "-c", "flask db upgrade && \
-                 flask seed-physical-activities-db && \
-                 flask seed-users-health-profiles-db && \
-                 flask seed-food-db && \
-                 flask seed-meal-db && \
-                 flask seed-measure-food-db && \
-                 flask run --host=0.0.0.0"]
+CMD ["sh", "-c", "flask run --host=0.0.0.0"]
+# CMD ["sh", "-c", "flask db upgrade && \
+#                  flask seed-physical-activities-db && \
+#                  flask seed-users-health-profiles-db && \
+#                  flask seed-food-db && \
+#                  flask seed-meal-db && \
+#                  flask seed-measure-food-db && \
+#                  flask run --host=0.0.0.0"]
