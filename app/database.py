@@ -111,7 +111,8 @@ def configure_app(app):
     """
     # Configurar la URI de la base de datos en la aplicación
     # app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://nutri_app_bi57_user:biXAVlprORv7mRLRzgRvVgieL4jT9JrG@dpg-d1eo9bngi27c73dkqeu0-a/nutri_app_bi57"
+    # app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://nutri_app_bi57_user:biXAVlprORv7mRLRzgRvVgieL4jT9JrG@dpg-d1eo9bngi27c73dkqeu0-a/nutri_app_bi57"
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://postgres.myztmhrqnaystmfnjcar:d6hY3nB3APQ8Q2HL@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Deshabilitar el seguimiento de modificaciones
     db.init_app(app)  # Inicializar SQLAlchemy con la aplicación
     migrate.init_app(app, db)  # Inicializar Flask-Migrate con la aplicación y la instancia de SQLAlchemy
